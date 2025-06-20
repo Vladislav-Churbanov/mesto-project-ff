@@ -1,7 +1,7 @@
-import './pages/index.css';
+import '../pages/index.css';
 import { initialCards } from './cards.js';
-import { createCard, deleteCard, like } from './cards.js';
-import { openModal, closeModal, listener } from './modal.js';
+import { createCard, deleteCard, like } from './card.js';
+import { openModal, closeModal, setPopupEventListeners } from './modal.js';
 
 const placesList = document.querySelector('.places__list');
 const profileEditButton = document.querySelector('.profile__edit-button');
@@ -9,6 +9,7 @@ const profileAddButton = document.querySelector('.profile__add-button');
 const popupEdit = document.querySelector('.popup_type_edit');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupImage = document.querySelector('.popup_type_image');
+const newPlaceForm = document.forms['new-place'];
 
 initialCards.forEach(function (element) {
   const card = createCard(element, deleteCard, openImagePopup, like);
@@ -32,7 +33,7 @@ profileEditButton.addEventListener('click', () => {
   openModal(popupEdit);
 });
 
-function handleFormSubmit(evt) {
+function submitEditProfileForm(evt) {
     evt.preventDefault();
 
     const newName = nameInput.value;
@@ -44,7 +45,7 @@ function handleFormSubmit(evt) {
     closeModal(popupEdit);
 }
 
-popupEdit.addEventListener('submit', handleFormSubmit);
+popupEdit.addEventListener('submit', submitEditProfileForm);
 /* попап для создания новых карточек */
   const placeInput = document.querySelector('.popup__input_type_card-name');
   const linkInput = document.querySelector('.popup__input_type_url');
@@ -53,7 +54,7 @@ profileAddButton.addEventListener('click', () => {
   openModal(popupNewCard);
 });
 
-function handleFormSubmitTwo(evt) {
+function submitNewCardForm(evt) {
     evt.preventDefault();
 
     const newPlace = placeInput.value;
@@ -63,13 +64,12 @@ function handleFormSubmitTwo(evt) {
 
   placesList.prepend(card);
 
-  placeInput.value = '';
-  linkInput.value = '';
+  newPlaceForm.reset();
 
   closeModal(popupNewCard);
 }
 
-popupNewCard.addEventListener('submit', handleFormSubmitTwo);
+popupNewCard.addEventListener('submit', submitNewCardForm);
 /* попап картинок */
 const popupImageElement = popupImage.querySelector('.popup__image');
 const popupCaption = popupImage.querySelector('.popup__caption');
@@ -84,12 +84,6 @@ function openImagePopup(imageSrc, imageAlt) {
 
 const images = document.querySelectorAll('.card__image');
 
-images.forEach((img) => {
-  img.addEventListener('click', () => {
-    openImagePopup(img.src, img.alt);
-  });
-});
-
-listener(popupEdit);
-listener(popupNewCard);
-listener(popupImage);
+setPopupEventListeners(popupEdit);
+setPopupEventListeners(popupNewCard);
+setPopupEventListeners(popupImage);

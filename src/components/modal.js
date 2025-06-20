@@ -19,7 +19,7 @@ export const closeModal = (modal) => {
   document.removeEventListener('keydown', handleEscKeyUp);
 };
 /* слушатель с закрытием на крестик */
-export const listener = (popup) => {
+export const setPopupEventListeners = (popup) => {
   const closeButtons = popup.querySelectorAll('.popup__close');
   closeButtons.forEach((button) => {
     button.addEventListener('click', () => {
