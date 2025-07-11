@@ -1,7 +1,8 @@
 import '../pages/index.css';
-import { initialCards } from './cards.js';
-import { createCard, deleteCard, like } from './card.js';
+import { createCard, deleteCard } from './card.js';
 import { openModal, closeModal, setPopupEventListeners } from './modal.js';
+import { validationConfig, setEventListenersForForm, enableValidation, clearValidation } from './validation.js';
+import { loadUserprofile, loadInitialData, updateUserProfile, addNewCard, updateUserAvatar, userId  } from './api.js';
 
 const placesList = document.querySelector('.places__list');
 const profileEditButton = document.querySelector('.profile__edit-button');
@@ -10,20 +11,19 @@ const popupEdit = document.querySelector('.popup_type_edit');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupImage = document.querySelector('.popup_type_image');
 const newPlaceForm = document.forms['new-place'];
-
-initialCards.forEach(function (element) {
-  const card = createCard(element, deleteCard, openImagePopup, like);
-  placesList.append(card);
-});
+const newAvatarForm = document.forms['new-avatar'];
+const avatarEditButton = document.querySelector('.profile__image');
+const popupAvatarEdit = document.querySelector('.popup_type_new-avatar');
 
 /* попап для редактирования профиля */
   const name = document.querySelector('.profile__title');
   const about = document.querySelector('.profile__description');
   const nameInput = document.querySelector('.popup__input_type_name');
   const aboutInput = document.querySelector('.popup__input_type_description');
+  const profileSaveButton = document.querySelector('.popup_type_edit .popup__button')
 
 profileEditButton.addEventListener('click', () => {
-
+  clearValidation(popupEdit, validationConfig);
   const userName = name.textContent;
   const userAbout = about.textContent;
 
@@ -31,42 +31,68 @@ profileEditButton.addEventListener('click', () => {
   aboutInput.value = userAbout;
 
   openModal(popupEdit);
+
+  const formElement = popupEdit.querySelector('.popup__form');
+  setEventListenersForForm(formElement, validationConfig);
 });
 
 function submitEditProfileForm(evt) {
-    evt.preventDefault();
+  evt.preventDefault();
 
-    const newName = nameInput.value;
-    const newAbout = aboutInput.value;
+  renderLoading(profileSaveButton, true);
 
-    name.textContent = newName;
-    about.textContent = newAbout;
+  const newName = nameInput.value;
+  const newAbout = aboutInput.value;
 
-    closeModal(popupEdit);
+  updateUserProfile({ name: newName, about: newAbout })
+    .then(updatedUserData => {
+      name.textContent = updatedUserData.name;
+      about.textContent = updatedUserData.about;
+      
+      closeModal(popupEdit);
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      renderLoading(profileSaveButton, false);
+    });
 }
 
 popupEdit.addEventListener('submit', submitEditProfileForm);
 /* попап для создания новых карточек */
   const placeInput = document.querySelector('.popup__input_type_card-name');
   const linkInput = document.querySelector('.popup__input_type_url');
+  const cardSaveButton = document.querySelector('.popup_type_new-card .popup__button')
 
 profileAddButton.addEventListener('click', () => {
+  clearValidation(popupNewCard, validationConfig);
+  newPlaceForm.reset();
   openModal(popupNewCard);
 });
 
 function submitNewCardForm(evt) {
-    evt.preventDefault();
+  evt.preventDefault();
 
-    const newPlace = placeInput.value;
-    const newLink = linkInput.value;
+  renderLoading(cardSaveButton, true);
 
-    const card = createCard({ name: newPlace, link: newLink }, deleteCard, openImagePopup, like);
+  const newPlace = placeInput.value;
+  const newLink = linkInput.value;
 
-  placesList.prepend(card);
+  addNewCard({ name: newPlace, link: newLink })
 
-  newPlaceForm.reset();
-
-  closeModal(popupNewCard);
+    .then(newCardData => {
+      const card = createCard(newCardData, deleteCard, openImagePopup, userId);
+      placesList.prepend(card);
+      newPlaceForm.reset();
+      closeModal(popupNewCard);
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      renderLoading(cardSaveButton, false);
+    });
 }
 
 popupNewCard.addEventListener('submit', submitNewCardForm);
@@ -74,7 +100,7 @@ popupNewCard.addEventListener('submit', submitNewCardForm);
 const popupImageElement = popupImage.querySelector('.popup__image');
 const popupCaption = popupImage.querySelector('.popup__caption');
 
-function openImagePopup(imageSrc, imageAlt) {
+export function openImagePopup(imageSrc, imageAlt) {
   popupImageElement.src = imageSrc;
   popupImageElement.alt = imageAlt;
   popupCaption.textContent = imageAlt;
@@ -84,6 +110,52 @@ function openImagePopup(imageSrc, imageAlt) {
 
 const images = document.querySelectorAll('.card__image');
 
+/* попап редактирования аватара */
+const avatarInput = document.querySelector('.popup__input_type_avatar_url');
+const avatarSaveButton = document.querySelector('.popup_type_new-avatar .popup__button')
+
+avatarEditButton.addEventListener('click', () => {
+  openModal(popupAvatarEdit);
+  newAvatarForm.reset();
+});
+
+popupAvatarEdit.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+
+  renderLoading(avatarSaveButton, true);
+
+  const avatarUrl = avatarInput.value;
+
+  updateUserAvatar(avatarUrl)
+    .then((userData) => {
+      avatarEditButton.style.backgroundImage = `url(${userData.avatar})`;
+
+      closeModal(popupAvatarEdit);
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      renderLoading(avatarSaveButton, false);
+    });
+});
+
 setPopupEventListeners(popupEdit);
 setPopupEventListeners(popupNewCard);
 setPopupEventListeners(popupImage);
+setPopupEventListeners(popupAvatarEdit);
+/* вызов функции для валидации */
+enableValidation(validationConfig);
+
+/* API */
+loadUserprofile(); //оставить в index.js
+loadInitialData(); //оставить в index.js
+
+/* уведомление о процессе загрузки */
+function renderLoading(button, isLoading) {
+  if (isLoading) {
+    button.textContent = 'Сохранение...';
+  } else {
+    button.textContent = 'Сохранить';
+  }
+}

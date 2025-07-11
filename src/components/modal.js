@@ -1,4 +1,3 @@
-
 /* закрытие esc */
 const handleEscKeyUp = (e) => {
   if (e.key === 'Escape') {
