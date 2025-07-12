@@ -1,14 +1,16 @@
 import { createCard, deleteCard } from './card.js';
 import { openImagePopup } from './index.js';
 
+const sampleUrl = 'https://nomoreparties.co/v1/wff-cohort-42';
+const token = '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf';
 const avatarEditButton = document.querySelector('.profile__image');
 const placesList = document.querySelector('.places__list');
 /* отображение данных пользователя */
 export function loadUserprofile() {
-  fetch('https://nomoreparties.co/v1/wff-cohort-42/users/me', {
+  fetch(`${sampleUrl}/users/me`, {
     method: 'GET',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     }
   })
@@ -32,10 +34,10 @@ export function loadUserprofile() {
 export let userId = null;
 
 export function loadInitialData() {
-  const userPromise = fetch('https://nomoreparties.co/v1/wff-cohort-42/users/me', {
+  const userPromise = fetch(`${sampleUrl}/users/me`, {
     method: 'GET',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     }
   }).then(res => {
@@ -43,10 +45,10 @@ export function loadInitialData() {
     return Promise.reject(`Ошибка данных пользователя: ${res.status}`);
   });
 
-  const cardsPromise = fetch('https://nomoreparties.co/v1/wff-cohort-42/cards', {
+  const cardsPromise = fetch(`${sampleUrl}/cards`, {
     method: 'GET',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     }
   }).then(res => {
@@ -70,10 +72,10 @@ export function loadInitialData() {
 
 /* редактирование данных пользователя */
 export function updateUserProfile({ name, about }) {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-42/users/me', {
+  return fetch(`${sampleUrl}/users/me`, {
     method: 'PATCH',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ name, about })
@@ -88,10 +90,10 @@ export function updateUserProfile({ name, about }) {
 
 /* создание новой карточки */
 export function addNewCard({ name, link }) {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-42/cards', {
+  return fetch(`${sampleUrl}/cards`, {
     method: 'POST',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf', // ваш токен
+      authorization: token,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ name, link })
@@ -106,12 +108,12 @@ export function addNewCard({ name, link }) {
 
 /* удаление карточек */
 export function DeleteMyCard(cardId) {
-  const url = `https://nomoreparties.co/v1/wff-cohort-42/cards/${cardId}`;
+  const url = `${sampleUrl}/cards/${cardId}`;
 
   return fetch(url, {
     method: 'DELETE',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     }
   });
@@ -119,11 +121,11 @@ export function DeleteMyCard(cardId) {
 
 /* лайк карточек */
 export function sendLike(cardId) {
-  const url = `https://nomoreparties.co/v1/wff-cohort-42/cards/likes/${cardId}`;
+  const url = `${sampleUrl}/cards/likes/${cardId}`;
   return fetch(url, {
     method: 'PUT',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     }
   }).then(res => {
@@ -135,11 +137,11 @@ export function sendLike(cardId) {
 }
 
 export function removeLike(cardId) {
-  const url = `https://nomoreparties.co/v1/wff-cohort-42/cards/likes/${cardId}`;
+  const url = `${sampleUrl}/cards/likes/${cardId}`;
   return fetch(url, {
     method: 'DELETE',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     }
   }).then(res => {
@@ -152,10 +154,10 @@ export function removeLike(cardId) {
 
 /* обновление аватара */
 export function updateUserAvatar(avatarUrl) {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-42/users/me/avatar', {
+  return fetch(`${sampleUrl}/users/me/avatar`, {
     method: 'PATCH',
     headers: {
-      authorization: '9dbc0cf6-bc48-4ed0-8261-5139301ceaaf',
+      authorization: token,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ avatar: avatarUrl })

@@ -115,6 +115,7 @@ const avatarInput = document.querySelector('.popup__input_type_avatar_url');
 const avatarSaveButton = document.querySelector('.popup_type_new-avatar .popup__button')
 
 avatarEditButton.addEventListener('click', () => {
+  clearValidation(popupAvatarEdit, validationConfig);
   openModal(popupAvatarEdit);
   newAvatarForm.reset();
 });
