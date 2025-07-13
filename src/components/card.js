@@ -1,4 +1,4 @@
-import { DeleteMyCard, removeLike, sendLike  } from './api.js';
+import { deleteMyCard, removeLike, sendLike  } from './api.js';
 const cardTemplate = document.querySelector('#card-template').content;
 /* создание карточек */
 export function createCard (card, deleteCard, openImagePopup, userId) {
@@ -32,8 +32,8 @@ export function createCard (card, deleteCard, openImagePopup, userId) {
     openImagePopup(card.link, card.name);
   });
 
-  likeButton.addEventListener('click', (evt) => {
-  toggleLike(evt, card);
+  likeButton.addEventListener('click', () => {
+  toggleLike(likeButton, likeCounter, card);
 });
 
   return cardElement;
@@ -41,25 +41,18 @@ export function createCard (card, deleteCard, openImagePopup, userId) {
 
 /* удаление карточек */
 export function deleteCard(cardData, cardDom) {
-  DeleteMyCard(cardData._id)
-    .then(res => {
-      if (res.ok) {
-        cardDom.remove();
-      } else {
-        return Promise.reject(`Ошибка при удалении: ${res.status}`);
-      }
+  deleteMyCard(cardData._id)
+    .then(() => {
+      cardDom.remove();
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
-      alert('Не удалось удалить карточку. Попробуйте позже.');
     });
 }
 
 /* лайк карточек */
-export function toggleLike(evt, cardData) {
-  const likeButton = evt.currentTarget;
+function toggleLike(likeButton, likeCounter, cardData) {
   const cardId = cardData._id;
-  const likeCounter = likeButton.closest('.places__item').querySelector('.card__like-counter');
 
   if (likeButton.classList.contains('card__like-button_is-active')) {
     removeLike(cardId)
@@ -68,8 +61,8 @@ export function toggleLike(evt, cardData) {
         likeCounter.textContent = updatedCard.likes.length;
       })
       .catch((err) => {
-    console.log(err);
-  });
+        console.log(err);
+      });
   } else {
     sendLike(cardId)
       .then(updatedCard => {
@@ -77,7 +70,7 @@ export function toggleLike(evt, cardData) {
         likeCounter.textContent = updatedCard.likes.length;
       })
       .catch((err) => {
-    console.log(err);
-  });
+        console.log(err);
+      });
   }
 }
