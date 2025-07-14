@@ -14,20 +14,19 @@ function getResponseData(res) {
 }
 
 /* отображение карточек и данных пользователя */
-export let userPromise = null;
-export let cardsPromise = null;
-
 export function loadInitialData() {
-  userPromise = fetch(`${config.baseUrl}/users/me`, {
+  const userPromise = fetch(`${config.baseUrl}/users/me`, {
     method: 'GET',
     headers: config.headers
   }).then(getResponseData);
 
-  cardsPromise = fetch(`${config.baseUrl}/cards`, {
+  const cardsPromise = fetch(`${config.baseUrl}/cards`, {
     method: 'GET',
     headers: config.headers
   }).then(getResponseData);
-}
+
+  return Promise.all([userPromise, cardsPromise]);
+} 
 
 /* редактирование данных пользователя */
 export function updateUserProfile({ name, about }) {

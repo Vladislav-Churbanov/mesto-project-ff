@@ -2,7 +2,7 @@ import '../pages/index.css';
 import { createCard, deleteCard } from './card.js';
 import { openModal, closeModal, setPopupEventListeners } from './modal.js';
 import { enableValidation, clearValidation, toggleButtonState } from './validation.js';
-import { loadInitialData, updateUserProfile, addNewCard, updateUserAvatar, userPromise, cardsPromise  } from './api.js';
+import { loadInitialData, updateUserProfile, addNewCard, updateUserAvatar  } from './api.js';
 
 const placesList = document.querySelector('.places__list');
 const profileEditButton = document.querySelector('.profile__edit-button');
@@ -162,7 +162,6 @@ enableValidation(validationConfig);
 
 /* API */
 loadInitialData()
-  Promise.all([userPromise, cardsPromise])
   .then(([userData, cardsData]) => {
     userId = userData._id;
     document.querySelector('.profile__title').textContent = userData.name;
